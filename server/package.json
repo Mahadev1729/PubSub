@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "perf": "node scripts/perf-runner.js"
+    "perf": "node scripts/perf-runner.js",
+    "bench:subs": "node scripts/bench-subscribers.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
