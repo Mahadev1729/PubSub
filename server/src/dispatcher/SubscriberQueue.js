@@ -1,18 +1,10 @@
 export class SubscriberQueue {
-  /**
-   * @param {{ maxSize: number }} opts
-   */
   constructor(opts) {
     this.maxSize = opts.maxSize;
-    /** @type {any[]} */
     this.items = [];
     this.dropped = 0;
   }
 
-  /**
-   * @param {any} item
-   * @returns {{ ok: true } | { ok: false, dropped: number }}
-   */
   push(item) {
     if (this.items.length >= this.maxSize) {
       this.items.shift();
@@ -32,4 +24,3 @@ export class SubscriberQueue {
     return this.items.length;
   }
 }
-
