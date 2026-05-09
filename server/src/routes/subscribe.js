@@ -1,14 +1,10 @@
 import express from "express";
 import { STATE_LIST } from "../constants.js";
 
-/**
- * @param {{ dispatcher: import("../dispatcher/Dispatcher.js").Dispatcher }} deps
- */
 export function createSubscribeRouter(deps) {
   const router = express.Router();
 
   router.get("/", (req, res) => {
-    // SSE headers
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
@@ -57,4 +53,3 @@ export function createSubscribeRouter(deps) {
 
   return router;
 }
-
