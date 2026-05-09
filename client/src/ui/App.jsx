@@ -24,9 +24,7 @@ export function App() {
   const [simulateDelayMs, setSimulateDelayMs] = useState(0);
   const unsubRef = useRef(null);
 
-  const [log, setLog] = useState(() => [
-    { ts: nowIso(), level: "ok", msg: "UI ready. Start server on :4000, then subscribe." }
-  ]);
+  const [log, setLog] = useState(() => [{ ts: nowIso(), level: "ok", msg: "Ready." }]);
 
   const logText = useMemo(() => log.map(fmtLine).join("\n"), [log]);
 
@@ -36,10 +34,11 @@ export function App() {
   }
 
   useEffect(() => {
-    refresh().catch((e) => {
-      setLog((l) => [...l, { ts: nowIso(), level: "bad", msg: "Failed to load jobs", data: { error: String(e) } }]);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    listJobs()
+      .then((r) => setJobs(r.jobs))
+      .catch((e) => {
+        setLog((l) => [...l, { ts: nowIso(), level: "bad", msg: "Failed to load jobs", data: { error: String(e) } }]);
+      });
   }, []);
 
   function pushLog(level, msg, data) {
@@ -124,8 +123,8 @@ export function App() {
     <div className="container">
       <div className="header">
         <div className="title">
-          <h1>High-Throughput State Notifier (Custom Pub-Sub)</h1>
-          <p>Mongo polling + in-memory dispatcher + SSE clients. No Change Streams, no external broker.</p>
+          <h1>State notifier</h1>
+          <p>Jobs, polling, SSE subscribe.</p>
         </div>
         <div className="row">
           <input className="input" value={api} onChange={(e) => setApi(e.target.value)} placeholder="API base (e.g. http://localhost:4000)" />
@@ -232,22 +231,6 @@ export function App() {
             Connection: <span className={connected ? "ok" : "bad"}>{connected ? "connected" : "disconnected"}</span>
             {" · "}
             Simulated subscriber delay: <span className={simulateDelayMs > 0 ? "warn" : ""}>{simulateDelayMs}ms</span>
-          </div>
-
-          <div className="divider" />
-
-          <div className="muted" style={{ marginBottom: 10 }}>
-            Quick API examples (PowerShell):
-          </div>
-          <div className="codeBox" style={{ marginBottom: 12 }}>
-            {`# Health
-(Invoke-WebRequest -UseBasicParsing ${api}/api/health).Content
-
-# Create a job
-Invoke-RestMethod -Method Post -Uri ${api}/api/jobs -ContentType application/json -Body '{ "name": "job-1" }'
-
-# Subscribe (stateChange) - use the UI connect for SSE
-${api}/api/subscribe?kind=stateChange`}
           </div>
 
           <div className="log">{logText}</div>
