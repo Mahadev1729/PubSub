@@ -71,7 +71,6 @@ async function main() {
 
   const t1 = process.hrtime.bigint();
   const elapsedSec = Number(t1 - t0) / 1e9;
-  // eslint-disable-next-line no-console
   console.log(
     JSON.stringify(
       {
@@ -89,7 +88,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  // eslint-disable-next-line no-console
   console.error(e);
   process.exit(1);
 });
