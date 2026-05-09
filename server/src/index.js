@@ -27,19 +27,7 @@ app.use(express.json({ limit: "1mb" }));
 try {
   await connectDb(MONGODB_URI);
 } catch (e) {
-  const looksPlaceholder = /<[^>]+>/.test(MONGODB_URI);
-  // eslint-disable-next-line no-console
-  console.error(
-    [
-      "Failed to connect to MongoDB.",
-      `MONGODB_URI=${MONGODB_URI}`,
-      looksPlaceholder
-        ? "It looks like your connection string still contains placeholders like <password>. Replace them with real values."
-        : "If using Atlas, ensure: (1) correct DB user/password, (2) Network Access IP allowlist includes your IP, (3) password is URL-encoded if it contains special characters.",
-      "Tip: you can set MONGODB_ATLAS_HOST, MONGODB_ATLAS_USER, MONGODB_ATLAS_PASSWORD, MONGODB_DBNAME instead of pasting a full URI; the server will URL-encode the password.",
-      `Error: ${e?.message ?? String(e)}`
-    ].join("\n")
-  );
+  console.error("MongoDB connection failed:", MONGODB_URI, e?.message ?? e);
   process.exit(1);
 }
 
@@ -68,7 +56,6 @@ app.use("/api/jobs", jobsRouter);
 app.use("/api/subscribe", createSubscribeRouter({ dispatcher }));
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`Server listening on http://localhost:${PORT}`);
 });
 
