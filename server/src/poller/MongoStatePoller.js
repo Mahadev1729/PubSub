@@ -1,19 +1,6 @@
 import { Checkpoint } from "../models/Checkpoint.js";
 
-/**
- * Polls MongoDB for updates using a persisted cursor (updatedAt + _id).
- * Constraint compliance: no MongoDB Change Streams/Triggers used.
- */
 export class MongoStatePoller {
-  /**
-   * @param {{
-   *  name: string,
-   *  model: any,
-   *  intervalMs: number,
-   *  batchSize: number,
-   *  onTransition: (evt: { jobId: string, name: string, from: string, to: string, at: string, version: number }) => void,
-   * }} opts
-   */
   constructor(opts) {
     this.name = opts.name;
     this.model = opts.model;
@@ -35,9 +22,6 @@ export class MongoStatePoller {
     return created.toObject();
   }
 
-  /**
-   * @param {{ lastUpdatedAt: Date, lastId: any }} cp
-   */
   async _saveCheckpoint(cp) {
     await Checkpoint.updateOne(
       { name: this.name },
@@ -54,7 +38,6 @@ export class MongoStatePoller {
     const tick = async () => {
       if (!this.running) return;
       try {
-        // Query "newer than checkpoint" ordered by (updatedAt, _id).
         const docs = await this.model
           .find(
             {
@@ -70,9 +53,6 @@ export class MongoStatePoller {
           .lean();
 
         for (const d of docs) {
-          // Best-effort transition reconstruction:
-          // - Prefer the last history entry (from -> to).
-          // - Fallback: treat as stateChange (from==to) if history is missing.
           const lastHist = Array.isArray(d.stateHistory) && d.stateHistory.length > 0 ? d.stateHistory[d.stateHistory.length - 1] : null;
           const from = lastHist?.from ?? d.state;
           const to = lastHist?.to ?? d.state;
@@ -94,7 +74,6 @@ export class MongoStatePoller {
           await this._saveCheckpoint(cp);
         }
       } catch (e) {
-        // Keep polling even after transient failures; checkpoint prevents missing transitions.
       } finally {
         this.timer = setTimeout(tick, this.intervalMs);
       }
@@ -109,4 +88,3 @@ export class MongoStatePoller {
     this.timer = null;
   }
 }
-
