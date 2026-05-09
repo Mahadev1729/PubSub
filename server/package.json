@@ -1,0 +1,18 @@
+{
+  "name": "pubsub-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "perf": "node scripts/perf-runner.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "mongoose": "^8.16.0",
+    "nanoid": "^5.1.5"
+  }
+}
+

@@ -1,0 +1,15 @@
+{
+  "name": "c-pubsub",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w server",
+    "dev:all": "npm run dev -w server & npm run dev -w client",
+    "build": "npm run build -w client",
+    "test:perf": "npm run perf -w server"
+  }
+}
+
